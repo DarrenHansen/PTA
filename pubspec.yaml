@@ -1,0 +1,79 @@
+name: Fasnota
+description: Aplikasi Invoice modern dengan Flutter - Kelola invoice dengan mudah, cepat, dan profesional.
+publish_to: 'none'
+
+version: 2.0.0+2
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  # Utilities
+  image: ^4.2.0
+  intl: ^0.20.2
+  shared_preferences: ^2.2.2
+  http: ^1.2.2
+  url_launcher: ^6.2.2
+
+  # State Management
+  provider: ^6.1.1
+
+  # PDF Generation
+  pdf: ^3.10.7
+  printing: ^5.11.1
+
+  # Sharing
+  share_plus: ^7.2.1
+
+  # Image Picker
+  image_picker: ^1.0.7
+
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+  timezone: ^0.9.2
+  firebase_core: ^4.7.0
+  firebase_auth: ^6.4.0
+  cloud_firestore: ^6.3.0
+  firebase_storage: ^13.1.0
+  excel: ^4.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
+
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 700
+
+        - asset: assets/fonts/Nunito-ExtraBold.ttf
+          weight: 800
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+
+  image_path: "assets/icons/logo.png"
+
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/logo.png"
+
+  min_sdk_android: 21
