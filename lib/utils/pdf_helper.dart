@@ -338,7 +338,7 @@ class PdfHelper {
           pw.Expanded(
             child: _buildReportInfoCard(
               'INFO BISNIS',
-              businessProfile?.businessName ?? 'Fasnota',
+              businessProfile?.businessName ?? 'Fasnote',
               businessInfo,
             ),
           ),

@@ -105,7 +105,7 @@ class MyApp extends StatelessWidget {
     final localeProvider = context.watch<LocaleProvider>();
 
     return MaterialApp(
-      title: 'Fasnota',
+      title: 'Fasnote',
       debugShowCheckedModeBanner: false,
 
       /// Theme

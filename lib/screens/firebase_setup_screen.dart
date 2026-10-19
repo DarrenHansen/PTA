@@ -5,7 +5,7 @@ class FirebaseSetupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Fasnota - Konfigurasi',
+        title: 'Fasnote - Konfigurasi',
         home: Scaffold(
           body: Center(
             child: ConstrainedBox(

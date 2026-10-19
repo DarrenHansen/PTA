@@ -19,7 +19,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($data);
-        $token = $user->createToken('fasnota-mobile')->plainTextToken;
+        $token = $user->createToken('fasnote-mobile')->plainTextToken;
 
         return response()->json([
             'token' => $token,
@@ -41,7 +41,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('fasnota-mobile')->plainTextToken;
+        $token = $user->createToken('fasnote-mobile')->plainTextToken;
 
         return response()->json([
             'token' => $token,

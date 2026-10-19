@@ -84,7 +84,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(height: 28),
                       Text(
                           _signingUp
-                              ? 'Buat akun Fasnota'
+                              ? 'Buat akun Fasnote'
                               : 'Selamat datang kembali',
                           style: Theme.of(context)
                               .textTheme
@@ -93,8 +93,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(height: 8),
                       Text(
                           _signingUp
-                              ? 'Daftar untuk mulai menggunakan Fasnota.'
-                              : 'Masuk untuk melanjutkan ke Fasnota.',
+                              ? 'Daftar untuk mulai menggunakan Fasnote.'
+                              : 'Masuk untuk melanjutkan ke Fasnote.',
                           style: TextStyle(
                               color: dark ? Colors.white70 : Colors.black54)),
                       const SizedBox(height: 28),

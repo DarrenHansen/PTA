@@ -1,6 +1,6 @@
-# Menyiapkan Fasnota dengan Firebase
+# Menyiapkan Fasnote dengan Firebase
 
-Fasnota memakai Flutter untuk Android dan web. Firebase Authentication menangani akun, Cloud Firestore menyimpan data, dan Cloud Storage bersifat opsional untuk gambar produk/logo. XAMPP, PHP, Laravel, dan MySQL tidak dibutuhkan untuk menjalankan konfigurasi ini.
+Fasnote memakai Flutter untuk Android dan web. Firebase Authentication menangani akun, Cloud Firestore menyimpan data, dan Cloud Storage bersifat opsional untuk gambar produk/logo. XAMPP, PHP, Laravel, dan MySQL tidak dibutuhkan untuk menjalankan konfigurasi ini.
 
 ## 1. Buat layanan Firebase
 

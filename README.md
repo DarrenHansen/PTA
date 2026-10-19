@@ -1,6 +1,6 @@
-# Fasnota
+# Fasnote
 
-Fasnota adalah aplikasi Flutter yang dapat dijalankan di Android dan web. Login menggunakan Firebase Authentication, sedangkan invoice, pelanggan, produk, persediaan, dan profil usaha disimpan di Cloud Firestore per akun pengguna.
+Fasnote adalah aplikasi Flutter yang dapat dijalankan di Android dan web. Login menggunakan Firebase Authentication, sedangkan invoice, pelanggan, produk, persediaan, dan profil usaha disimpan di Cloud Firestore per akun pengguna.
 
 ## Menyiapkan dan menjalankan
 

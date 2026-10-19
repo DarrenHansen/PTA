@@ -390,7 +390,7 @@ class ReportExportHelper {
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ),
       ],
-      subject: 'Laporan Penjualan Fasnota',
+      subject: 'Laporan Penjualan Fasnote',
       text:
           'Laporan penjualan ${Helpers.formatDate(start)} - ${Helpers.formatDate(end)}',
     );

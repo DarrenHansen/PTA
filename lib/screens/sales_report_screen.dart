@@ -20,7 +20,7 @@ extension on _ReportStatusFilter {
       };
 }
 
-/// Sales summary based on invoice dates stored in Fasnota.
+/// Sales summary based on invoice dates stored in Fasnote.
 class SalesReportScreen extends StatefulWidget {
   const SalesReportScreen({super.key});
 

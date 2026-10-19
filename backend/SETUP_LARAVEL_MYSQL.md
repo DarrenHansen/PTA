@@ -1,4 +1,4 @@
-# Tahap pembuatan Fasnota dengan Laravel dan MySQL
+# Tahap pembuatan Fasnote dengan Laravel dan MySQL
 
 ## Arsitektur yang dibuat
 
@@ -25,17 +25,17 @@ Dari folder kerja baru:
     cd backend
     php artisan install:api
 
-Perintah `install:api` menyiapkan routing API dan Laravel Sanctum. Pada proyek Fasnota ini, Laravel 12, Sanctum, route API, controller, model, dan migration sudah dibuat di folder `backend`.
+Perintah `install:api` menyiapkan routing API dan Laravel Sanctum. Pada proyek Fasnote ini, Laravel 12, Sanctum, route API, controller, model, dan migration sudah dibuat di folder `backend`.
 
 ## Tahap 3 — Buat database MySQL
 
 1. Buka XAMPP Control Panel, lalu jalankan MySQL.
 2. Buka `http://localhost/phpmyadmin`.
-3. Buat database bernama `fasnota` dengan collation `utf8mb4_unicode_ci`.
+3. Buat database bernama `fasnote` dengan collation `utf8mb4_unicode_ci`.
 
 Atau jalankan SQL di phpMyAdmin:
 
-    CREATE DATABASE fasnota
+    CREATE DATABASE fasnote
       CHARACTER SET utf8mb4
       COLLATE utf8mb4_unicode_ci;
 
@@ -43,14 +43,14 @@ Atau jalankan SQL di phpMyAdmin:
 
 Buka `backend/.env` dan pastikan pengaturan lokal seperti berikut. Sesuaikan user/password jika konfigurasi MySQL berbeda:
 
-    APP_NAME=Fasnota
+    APP_NAME=Fasnote
     APP_ENV=local
     APP_DEBUG=true
     APP_URL=http://127.0.0.1:8000
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_DATABASE=fasnota
+    DB_DATABASE=fasnote
     DB_USERNAME=root
     DB_PASSWORD=
 
