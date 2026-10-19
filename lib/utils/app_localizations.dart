@@ -153,7 +153,7 @@ class AppLocalizations {
     'id': {
       'app_title': 'Fasnote',
       'welcome_subtitle':
-          'Kelola invoice dengan mudah,\ncepat, dan profesional.',
+          'Kelola invoice dan laporan dengan mudah,\ncepat, dan profesional.',
       'get_started': 'MULAI',
       'invoices': 'Invoice',
       'reports': 'Laporan',
