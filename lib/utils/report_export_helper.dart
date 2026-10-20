@@ -33,6 +33,7 @@ class ReportExportHelper {
   static Future<void> exportSalesExcel({
     required List<Invoice> invoices,
     required int lateInvoiceCount,
+    required int soldItemQuantity,
     required DateTime startDate,
     required DateTime endDate,
   }) async {
@@ -187,10 +188,14 @@ class ReportExportHelper {
       DoubleCellValue(total),
       currency: true,
     );
+    appendSummaryRow(
+      'Jumlah barang terjual (periode)',
+      IntCellValue(soldItemQuantity),
+    );
     sheet.appendRow([TextCellValue('')]);
 
-    const reportHeaderRow = 9;
-    const reportDataStartRow = reportHeaderRow + 1;
+    final reportHeaderRow = sheet.maxRows;
+    final reportDataStartRow = reportHeaderRow + 1;
     sheet.appendRow([
       TextCellValue('No'),
       TextCellValue('Nomor invoice'),

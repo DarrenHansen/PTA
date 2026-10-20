@@ -14,7 +14,7 @@ Fasnote memakai Flutter untuk Android dan web. Firebase Authentication menangani
 
 ## 2. Terapkan aturan Firestore
 
-File `firestore.rules` membatasi setiap akun hanya dapat membaca dan mengubah dokumen di `users/{uid}` miliknya. File `firebase.json` menunjuk ke rules dalam repositori ini. Pasang Firebase CLI dan login, lalu dari direktori proyek jalankan:
+File `firestore.rules` membatasi akses data per toko. Kasir yang terdaftar dapat mengelola data toko, sedangkan akun Owner hanya dapat membacanya. Peran disimpan di koleksi `user_roles` dan hanya dapat diatur melalui Firebase Console oleh administrator. File `firebase.json` menunjuk ke rules dalam repositori ini. Pasang Firebase CLI dan login, lalu dari direktori proyek jalankan:
 
 ```powershell
 firebase use --add
@@ -23,7 +23,18 @@ firebase deploy --only firestore:rules
 
 Pilih project Firebase yang sama saat `firebase use --add`. Jika belum memakai Firebase CLI, salin isi `firestore.rules` ke **Firestore Database → Rules** di Console dan terbitkan rules tersebut.
 
-## 3. (Opsional) Aktifkan penyimpanan gambar
+## 3. Atur akun Owner dan Kasir
+
+1. Buat akun melalui halaman Daftar Fasnote. Akun baru berperan sebagai Kasir sampai dipetakan ke toko.
+2. Buka **Authentication → Users** dan salin UID akun.
+3. Buka **Firestore Database → Data**, buat koleksi `user_roles`, lalu gunakan UID sebagai ID dokumen.
+4. Untuk akun Owner, buat field `role` bertipe string bernilai `owner` dan `businessOwnerUid` bertipe string berisi UID akun Owner itu sendiri.
+5. Untuk akun Kasir, buat field `role` bertipe string bernilai `cashier` dan `businessOwnerUid` bertipe string berisi UID Owner tokonya.
+6. Terbitkan rules terbaru. Akun Kasir dan Owner kemudian membaca data toko yang berada di `users/{UID Owner}`. Owner hanya mendapat tampilan Barang, Stok, dan Laporan; rules juga menolak perubahan data dari akun Owner.
+
+Rules menolak perubahan dokumen `user_roles` dari aplikasi. Pengaturan peran harus dilakukan oleh administrator di Firebase Console.
+
+## 4. (Opsional) Aktifkan penyimpanan gambar
 
 Foto produk dan logo memakai Firebase Storage. Fitur data lain—akun, invoice, laporan, produk dan stok—tetap dapat dipakai tanpa Storage; jangan pilih gambar bila Storage belum disiapkan.
 
@@ -35,7 +46,7 @@ firebase deploy --only storage
 
 Periksa halaman harga Firebase sebelum mengaktifkan Storage: pembuatan bucket baru untuk Cloud Storage for Firebase memerlukan paket Blaze (pay-as-you-go) dan penggunaan dapat menimbulkan biaya. Jangan aktifkan paket tersebut tanpa menyetujui ketentuan tagihan.
 
-## 4. Jalankan aplikasi
+## 5. Jalankan aplikasi
 
 Buka PowerShell di direktori proyek dan jalankan untuk web:
 
@@ -52,7 +63,7 @@ flutter run -d emulator-5554 --dart-define=FIREBASE_ANDROID_APP_ID=ANDROID_APP_I
 
 Bucket bawaan project `pta1-bd19f` sudah diatur di aplikasi sebagai `pta1-bd19f.firebasestorage.app`. Jika memakai bucket lain, tambahkan `--dart-define=FIREBASE_STORAGE_BUCKET=BUCKET_ANDA` pada perintah. Untuk login web, tambahkan domain hosting ke **Authentication → Settings → Authorized domains**.
 
-## 5. Buat dan pasang website
+## 6. Buat dan pasang website
 
 Jalankan perintah build berikut:
 
@@ -64,4 +75,4 @@ Hasil website statis berada di `build/web`. Folder itu dapat dipasang pada Fireb
 
 ## Catatan data
 
-Penggantian backend ke Firestore tidak menyalin database lama secara otomatis. Produk, pelanggan, profil, dan invoice sebelumnya perlu diimpor dengan proses migrasi tersendiri bila datanya akan dipertahankan. Sistem baru membuat data dalam ruang akun pengguna yang masuk.
+Penggantian backend ke Firestore tidak menyalin database lama secara otomatis. Produk, pelanggan, profil, dan invoice sebelumnya perlu diimpor dengan proses migrasi tersendiri bila datanya akan dipertahankan. Data toko disimpan dalam ruang UID Owner; akun Kasir yang dipetakan ke toko tersebut menggunakan data yang sama.

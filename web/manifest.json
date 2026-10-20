@@ -1,11 +1,11 @@
 {
-    "name": "testapp",
-    "short_name": "testapp",
+    "name": "Fasnote - Toko Kemplang & Kerupuk 619",
+    "short_name": "Fasnote 619",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#B3262D",
+    "description": "Sistem informasi penjualan Toko Kemplang & Kerupuk 619",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

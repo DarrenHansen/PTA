@@ -19,6 +19,7 @@ class _AuthScreenState extends State<AuthScreen> {
   late bool _signingUp;
   bool _busy = false;
   bool _hidePassword = true;
+  String _selectedRole = 'cashier';
 
   @override
   void initState() {
@@ -42,7 +43,9 @@ class _AuthScreenState extends State<AuthScreen> {
         ? await AuthService.signUp(
             name: _name.text, email: _email.text, password: _password.text)
         : await AuthService.signIn(
-            email: _email.text, password: _password.text);
+            email: _email.text,
+            password: _password.text,
+            selectedRole: _selectedRole);
     if (!mounted) return;
     setState(() => _busy = false);
     if (error != null) {
@@ -51,7 +54,9 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+      MaterialPageRoute(
+          builder: (_) => MainNavigationScreen(
+              role: _signingUp ? 'cashier' : _selectedRole)),
       (_) => false,
     );
   }
@@ -103,6 +108,32 @@ class _AuthScreenState extends State<AuthScreen> {
                             validator: (v) => (v == null || v.trim().isEmpty)
                                 ? 'Nama wajib diisi'
                                 : null),
+                        const SizedBox(height: 14),
+                      ],
+                      if (!_signingUp) ...[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text('Masuk sebagai',
+                              style: Theme.of(context).textTheme.labelLarge),
+                        ),
+                        const SizedBox(height: 8),
+                        SegmentedButton<String>(
+                          segments: const [
+                            ButtonSegment(
+                                value: 'cashier',
+                                label: Text('Kasir'),
+                                icon: Icon(Icons.point_of_sale_outlined)),
+                            ButtonSegment(
+                                value: 'owner',
+                                label: Text('Owner'),
+                                icon: Icon(Icons.store_outlined)),
+                          ],
+                          selected: {_selectedRole},
+                          onSelectionChanged: _busy
+                              ? null
+                              : (selection) => setState(
+                                  () => _selectedRole = selection.first),
+                        ),
                         const SizedBox(height: 14),
                       ],
                       _field(_email, 'Email', Icons.email_outlined,

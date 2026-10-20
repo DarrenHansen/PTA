@@ -22,6 +22,7 @@ import 'screens/welcome_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/auth_screen.dart';
 import 'services/auth_service.dart';
+import 'database/db_helper.dart';
 
 /// Check first app launch
 Future<bool> isFirstLaunch() async {
@@ -50,26 +51,38 @@ void main() async {
   final firstLaunch = await isFirstLaunch();
   final hasAccount = await AuthService.hasAccount;
   final signedIn = await AuthService.isSignedIn;
+  var userRole = 'cashier';
+  if (signedIn) {
+    try {
+      final access = await AuthService.loadAccessProfile();
+      userRole = access['role']!;
+      DBHelper.instance.setBusinessOwnerUid(access['businessOwnerUid']);
+    } catch (_) {
+      // Keep the app on the least-privileged navigation while offline.
+    }
+  }
 
   /// Initialize notifications
   if (!kIsWeb) await NotificationHelper.initialize();
   if (!kIsWeb) await NotificationHelper.requestPermissions();
 
   /// Transparent status bar
-  if (!kIsWeb)
+  if (!kIsWeb) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
       ),
     );
+  }
 
   /// Lock portrait
-  if (!kIsWeb)
+  if (!kIsWeb) {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
 
   runApp(
     MultiProvider(
@@ -82,7 +95,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => BusinessProfileProvider()),
       ],
       child: MyApp(
-          firstLaunch: firstLaunch, hasAccount: hasAccount, signedIn: signedIn),
+          firstLaunch: firstLaunch,
+          hasAccount: hasAccount,
+          signedIn: signedIn,
+          userRole: userRole),
     ),
   );
 }
@@ -91,12 +107,14 @@ class MyApp extends StatelessWidget {
   final bool firstLaunch;
   final bool hasAccount;
   final bool signedIn;
+  final String userRole;
 
   const MyApp({
     super.key,
     this.firstLaunch = false,
     this.hasAccount = false,
     this.signedIn = false,
+    this.userRole = 'cashier',
   });
 
   @override
@@ -131,7 +149,7 @@ class MyApp extends StatelessWidget {
           ? (firstLaunch
               ? const WelcomeScreen()
               : AuthScreen(hasAccount: hasAccount))
-          : const MainNavigationScreen(),
+          : MainNavigationScreen(role: userRole),
 
       /// Prevent system font scaling
       builder: (context, child) {

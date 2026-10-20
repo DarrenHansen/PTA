@@ -1,8 +1,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    function rolePath(uid) {
+      return /databases/$(database)/documents/user_roles/$(uid);
+    }
+    function hasRole(uid, role) {
+      return exists(rolePath(uid)) && get(rolePath(uid)).data.role == role;
+    }
+    function cashierFor(shopUid) {
+      return request.auth != null
+        && hasRole(request.auth.uid, 'cashier')
+        && get(rolePath(request.auth.uid)).data.businessOwnerUid == shopUid;
+    }
+    // Roles are assigned by a trusted administrator in Firebase Console.
+    // The signed-in user can read their role, but cannot promote themselves.
+    match /user_roles/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
+    // Existing shop data stays under users/{shopOwnerUid}. A cashier role
+    // assigned to that shop shares its data; owners can inspect it read-only.
+    match /users/{shopOwnerUid}/{document=**} {
+      allow read: if request.auth != null
+        && (request.auth.uid == shopOwnerUid || cashierFor(shopOwnerUid));
+      allow write: if request.auth != null
+        && ((request.auth.uid == shopOwnerUid
+              && !hasRole(request.auth.uid, 'owner'))
+            || cashierFor(shopOwnerUid));
     }
   }
 }

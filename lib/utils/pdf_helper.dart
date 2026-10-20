@@ -98,6 +98,7 @@ class PdfHelper {
   static Future<void> generateSalesReportPdf({
     required List<Invoice> invoices,
     required int lateInvoiceCount,
+    required int soldItemQuantity,
     required DateTime startDate,
     required DateTime endDate,
     BusinessProfile? businessProfile,
@@ -211,6 +212,8 @@ class PdfHelper {
           pw.SizedBox(height: 5),
           pw.Text(
               'Total penjualan lunas (periode): ${Helpers.formatCurrency(total)}'),
+          pw.SizedBox(height: 5),
+          pw.Text('Jumlah barang terjual (periode): $soldItemQuantity unit'),
           pw.SizedBox(height: 6),
           pw.Text(
             'Rincian tabel hanya memuat invoice lunas.',

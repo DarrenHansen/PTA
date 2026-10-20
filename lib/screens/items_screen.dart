@@ -16,7 +16,8 @@ import 'stock_movement_screen.dart';
 
 /// Items/Products Screen - Kelola data barang/produk
 class ItemsScreen extends StatefulWidget {
-  const ItemsScreen({super.key});
+  final bool readOnly;
+  const ItemsScreen({super.key, this.readOnly = false});
 
   @override
   State<ItemsScreen> createState() => _ItemsScreenState();
@@ -653,10 +654,15 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     return EmptyStateWidget(
                       icon: Icons.inventory_2_outlined,
                       title: loc.get('no_products'),
-                      subtitle: loc.get('create_first_product'),
-                      actionIcon: Icons.add,
-                      actionLabel: loc.get('add_product'),
-                      onAction: () => _showAddProductDialog(),
+                      subtitle: widget.readOnly
+                          ? 'Belum ada data barang.'
+                          : loc.get('create_first_product'),
+                      actionIcon: widget.readOnly ? null : Icons.add,
+                      actionLabel:
+                          widget.readOnly ? null : loc.get('add_product'),
+                      onAction: widget.readOnly
+                          ? null
+                          : () => _showAddProductDialog(),
                     );
                   }
 
@@ -747,51 +753,54 @@ class _ItemsScreenState extends State<ItemsScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          trailing: PopupMenuButton<String>(
-                            tooltip: 'Aksi produk',
-                            onSelected: (action) {
-                              switch (action) {
-                                case 'stock_in':
-                                  _showStockEntryDialog(product);
-                                  break;
-                                case 'stock_opname':
-                                  _showStockOpnameDialog(product);
-                                  break;
-                                case 'history':
-                                  _openStockMovements(product: product);
-                                  break;
-                                case 'edit':
-                                  _showAddProductDialog(editProduct: product);
-                                  break;
-                                case 'delete':
-                                  _deleteProduct(product);
-                                  break;
-                              }
-                            },
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(
-                                value: 'stock_in',
-                                child: Text('Tambah stok masuk'),
-                              ),
-                              PopupMenuItem(
-                                value: 'stock_opname',
-                                child: Text('Stok opname'),
-                              ),
-                              PopupMenuItem(
-                                value: 'history',
-                                child: Text('Riwayat stok produk'),
-                              ),
-                              PopupMenuDivider(),
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Ubah produk'),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Hapus produk'),
-                              ),
-                            ],
-                          ),
+                          trailing: widget.readOnly
+                              ? null
+                              : PopupMenuButton<String>(
+                                  tooltip: 'Aksi produk',
+                                  onSelected: (action) {
+                                    switch (action) {
+                                      case 'stock_in':
+                                        _showStockEntryDialog(product);
+                                        break;
+                                      case 'stock_opname':
+                                        _showStockOpnameDialog(product);
+                                        break;
+                                      case 'history':
+                                        _openStockMovements(product: product);
+                                        break;
+                                      case 'edit':
+                                        _showAddProductDialog(
+                                            editProduct: product);
+                                        break;
+                                      case 'delete':
+                                        _deleteProduct(product);
+                                        break;
+                                    }
+                                  },
+                                  itemBuilder: (_) => const [
+                                    PopupMenuItem(
+                                      value: 'stock_in',
+                                      child: Text('Tambah stok masuk'),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'stock_opname',
+                                      child: Text('Stok opname'),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'history',
+                                      child: Text('Riwayat stok produk'),
+                                    ),
+                                    PopupMenuDivider(),
+                                    PopupMenuItem(
+                                      value: 'edit',
+                                      child: Text('Ubah produk'),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'delete',
+                                      child: Text('Hapus produk'),
+                                    ),
+                                  ],
+                                ),
                         ),
                       );
                     },
@@ -802,10 +811,12 @@ class _ItemsScreenState extends State<ItemsScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddProductDialog(),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: widget.readOnly
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _showAddProductDialog(),
+              child: const Icon(Icons.add),
+            ),
     );
   }
 }

@@ -1,10 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../database/db_helper.dart';
 
 class AuthService {
   static const _emailKey = 'auth_email';
   static const _nameKey = 'auth_name';
   static FirebaseAuth get _auth => FirebaseAuth.instance;
+
+  static Future<Map<String, String>> loadAccessProfile() async {
+    final user = _auth.currentUser;
+    if (user == null) throw StateError('Masuk terlebih dahulu.');
+    final snapshot = await FirebaseFirestore.instance
+        .collection('user_roles')
+        .doc(user.uid)
+        .get();
+    final data = snapshot.data() ?? const <String, dynamic>{};
+    final role = data['role'] == 'owner' ? 'owner' : 'cashier';
+    final rawBusinessOwnerUid = data['businessOwnerUid'];
+    final businessOwnerUid =
+        rawBusinessOwnerUid is String ? rawBusinessOwnerUid.trim() : null;
+    return {
+      'role': role,
+      'businessOwnerUid':
+          businessOwnerUid?.isNotEmpty == true ? businessOwnerUid! : user.uid,
+    };
+  }
 
   static Future<bool> get hasAccount async =>
       (await SharedPreferences.getInstance()).getString(_emailKey) != null;
@@ -30,6 +51,7 @@ class AuthService {
       await credential.user?.updateDisplayName(name.trim());
       await credential.user?.reload();
       await _saveLocalProfile(name.trim(), email.trim().toLowerCase());
+      DBHelper.instance.setBusinessOwnerUid(credential.user!.uid);
       return null;
     } on FirebaseAuthException catch (error) {
       return _messageFor(error);
@@ -41,12 +63,21 @@ class AuthService {
   static Future<String?> signIn({
     required String email,
     required String password,
+    required String selectedRole,
   }) async {
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email.trim().toLowerCase(),
         password: password,
       );
+      final access = await loadAccessProfile();
+      if (access['role'] != selectedRole) {
+        await _clearFailedSignIn();
+        return selectedRole == 'owner'
+            ? 'Akun ini belum terdaftar sebagai Owner. Minta pengelola sistem mengatur perannya.'
+            : 'Akun ini terdaftar sebagai Owner. Pilih masuk sebagai Owner.';
+      }
+      DBHelper.instance.setBusinessOwnerUid(access['businessOwnerUid']!);
       await _saveLocalProfile(
         credential.user?.displayName ?? '',
         credential.user?.email ?? email.trim().toLowerCase(),
@@ -54,8 +85,21 @@ class AuthService {
       return null;
     } on FirebaseAuthException catch (error) {
       return _messageFor(error);
+    } on FirebaseException catch (error) {
+      await _clearFailedSignIn();
+      return _messageForFirebase(error);
     } catch (_) {
-      return 'Tidak dapat masuk. Periksa koneksi internet dan konfigurasi Firebase.';
+      await _clearFailedSignIn();
+      return 'Login Firebase berhasil, tetapi sesi aplikasi gagal disiapkan. '
+          'Periksa konfigurasi Firestore dan coba lagi.';
+    }
+  }
+
+  static Future<void> _clearFailedSignIn() async {
+    try {
+      await signOut();
+    } catch (_) {
+      // Preserve the original login error if Firebase sign-out also fails.
     }
   }
 
@@ -67,6 +111,7 @@ class AuthService {
 
   static Future<void> signOut() async {
     await _auth.signOut();
+    DBHelper.instance.setBusinessOwnerUid(null);
   }
 
   static String _messageFor(FirebaseAuthException error) {
@@ -86,5 +131,25 @@ class AuthService {
       default:
         return error.message ?? 'Terjadi kesalahan autentikasi.';
     }
+  }
+
+  static String _messageForFirebase(FirebaseException error) {
+    if (error.plugin == 'cloud_firestore') {
+      switch (error.code) {
+        case 'permission-denied':
+          return 'Login berhasil, tetapi Firestore menolak membaca profil akun. '
+              'Terbitkan aturan Firestore dari file firestore.rules di Firebase Console.';
+        case 'failed-precondition':
+        case 'not-found':
+          return 'Login berhasil, tetapi Cloud Firestore belum siap. '
+              'Pastikan database Firestore sudah dibuat di project Firebase yang sama.';
+        case 'unavailable':
+        case 'deadline-exceeded':
+          return 'Login berhasil, tetapi Firestore tidak dapat dijangkau. '
+              'Periksa koneksi internet lalu coba lagi.';
+      }
+    }
+    return 'Login berhasil, tetapi layanan ${error.plugin} gagal menyiapkan sesi '
+        '(${error.code}). ${error.message ?? 'Periksa konfigurasi Firebase.'}';
   }
 }

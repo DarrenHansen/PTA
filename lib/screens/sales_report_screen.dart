@@ -22,7 +22,9 @@ extension on _ReportStatusFilter {
 
 /// Sales summary based on invoice dates stored in Fasnote.
 class SalesReportScreen extends StatefulWidget {
-  const SalesReportScreen({super.key});
+  final bool readOnly;
+
+  const SalesReportScreen({super.key, this.readOnly = false});
 
   @override
   State<SalesReportScreen> createState() => SalesReportScreenState();
@@ -93,6 +95,7 @@ class SalesReportScreenState extends State<SalesReportScreen> {
       await ReportExportHelper.exportSalesExcel(
         invoices: invoices,
         lateInvoiceCount: _lateInvoices.length,
+        soldItemQuantity: _soldItemQuantity,
         startDate: _range.start,
         endDate: _range.end,
       );
@@ -111,6 +114,7 @@ class SalesReportScreenState extends State<SalesReportScreen> {
       await PdfHelper.generateSalesReportPdf(
         invoices: invoices,
         lateInvoiceCount: _lateInvoices.length,
+        soldItemQuantity: _soldItemQuantity,
         startDate: _range.start,
         endDate: _range.end,
         businessProfile:
@@ -178,6 +182,11 @@ class SalesReportScreenState extends State<SalesReportScreen> {
 
   double get _totalUnpaid =>
       _unpaidInvoices.fold(0, (sum, invoice) => sum + invoice.total);
+
+  int get _soldItemQuantity => _invoices.fold<int>(
+      0,
+      (sum, invoice) =>
+          sum + invoice.items.fold<int>(0, (qty, item) => qty + item.qty));
 
   Future<List<Invoice>> _loadInvoiceDetailsForExport() async =>
       Future.wait(_invoices.map((invoice) async {
@@ -370,6 +379,14 @@ class SalesReportScreenState extends State<SalesReportScreen> {
                   isDark: isDark,
                 )),
               ]),
+              const SizedBox(height: 12),
+              _SummaryCard(
+                icon: Icons.shopping_bag_outlined,
+                label: 'Jumlah barang terjual (periode)',
+                value: '$_soldItemQuantity unit',
+                accent: Colors.indigo,
+                isDark: isDark,
+              ),
               const SizedBox(height: 24),
               Row(children: [
                 Expanded(
@@ -407,8 +424,8 @@ class SalesReportScreenState extends State<SalesReportScreen> {
                           : 'Tidak ada invoice dengan status ${_statusFilter.label}.',
                 )
               else
-                ..._visibleInvoices
-                    .map((invoice) => _InvoiceReportTile(invoice: invoice)),
+                ..._visibleInvoices.map((invoice) => _InvoiceReportTile(
+                    invoice: invoice, readOnly: widget.readOnly)),
             ],
           ),
         ),
@@ -537,7 +554,9 @@ class _SummaryCard extends StatelessWidget {
 
 class _InvoiceReportTile extends StatelessWidget {
   final Invoice invoice;
-  const _InvoiceReportTile({required this.invoice});
+  final bool readOnly;
+
+  const _InvoiceReportTile({required this.invoice, required this.readOnly});
 
   @override
   Widget build(BuildContext context) {
@@ -604,7 +623,8 @@ class _InvoiceReportTile extends StatelessWidget {
                 builder: (_) => InvoiceDetailScreen(
                     invoice: invoice.copyWith(
                         items:
-                            items.map((item) => Item.fromMap(item)).toList())),
+                            items.map((item) => Item.fromMap(item)).toList()),
+                    readOnly: readOnly),
               ));
           if (context.mounted) {
             final state =

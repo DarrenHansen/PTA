@@ -65,6 +65,11 @@ class DashboardScreenState extends State<DashboardScreen> {
       .where((invoice) => invoice.status != InvoiceStatus.paid)
       .fold(0, (sum, invoice) => sum + invoice.total);
 
+  int get _soldItemQuantity => _invoices.fold<int>(
+      0,
+      (sum, invoice) =>
+          sum + invoice.items.fold<int>(0, (qty, item) => qty + item.qty));
+
   List<Product> _lowStockProducts(List<Product> products) => products
       .where((product) =>
           product.minimumStock > 0 && product.stock <= product.minimumStock)
@@ -216,6 +221,12 @@ class DashboardScreenState extends State<DashboardScreen> {
                                     color: const Color(0xFF5367B1),
                                     title: 'Invoice dibuat',
                                     value: '${_invoices.length}',
+                                  ),
+                                  _metricCard(
+                                    icon: Icons.shopping_bag_outlined,
+                                    color: Colors.indigo,
+                                    title: 'Barang terjual (7 hari)',
+                                    value: '$_soldItemQuantity unit',
                                   ),
                                   _metricCard(
                                     icon: Icons.payments_outlined,

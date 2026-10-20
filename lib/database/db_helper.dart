@@ -17,8 +17,12 @@ class DBHelper {
   String? lastProductPhotoUploadError;
   bool lastProductPhotoStoredInFirestore = false;
   bool lastBusinessLogoStoredInFirestore = false;
+  String? _businessOwnerUid;
 
   DBHelper._init();
+
+  /// Sets the shop account whose records this signed-in user can access.
+  void setBusinessOwnerUid(String? uid) => _businessOwnerUid = uid;
 
   static String describeStorageError(Object error) {
     final details = error.toString();
@@ -45,7 +49,7 @@ class DBHelper {
     if (uid == null) {
       throw StateError('Masuk terlebih dahulu untuk mengakses data.');
     }
-    return uid;
+    return _businessOwnerUid ?? uid;
   }
 
   CollectionReference<Map<String, dynamic>> _collection(String name) =>

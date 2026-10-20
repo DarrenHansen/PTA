@@ -17,8 +17,13 @@ import 'add_invoice_screen.dart';
 /// Invoice Detail Screen
 class InvoiceDetailScreen extends StatefulWidget {
   final Invoice invoice;
+  final bool readOnly;
 
-  const InvoiceDetailScreen({super.key, required this.invoice});
+  const InvoiceDetailScreen({
+    super.key,
+    required this.invoice,
+    this.readOnly = false,
+  });
 
   @override
   State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
@@ -85,6 +90,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   Future<void> _changeStatus(InvoiceStatus newStatus) async {
+    if (widget.readOnly) return;
     await context.read<InvoiceProvider>().updateStatus(invoice.id!, newStatus);
 
     setState(() {
@@ -97,6 +103,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   Future<void> _deleteInvoice() async {
+    if (widget.readOnly) return;
     final loc = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
@@ -220,6 +227,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   Future<void> _navigateToEdit() async {
+    if (widget.readOnly) return;
     final result = await Navigator.push(
       context,
       PageRouteBuilder(
@@ -279,14 +287,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               icon: const Icon(Icons.share_outlined),
               tooltip: loc.get('share'),
               onPressed: _showShareBottomSheet),
-          IconButton(
-              icon: const Icon(Icons.edit_outlined),
-              tooltip: loc.get('edit'),
-              onPressed: _navigateToEdit),
-          IconButton(
-              icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
-              tooltip: loc.get('delete'),
-              onPressed: _deleteInvoice),
+          if (!widget.readOnly)
+            IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                tooltip: loc.get('edit'),
+                onPressed: _navigateToEdit),
+          if (!widget.readOnly)
+            IconButton(
+                icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
+                tooltip: loc.get('delete'),
+                onPressed: _deleteInvoice),
         ],
       ),
       body: _isLoading
@@ -306,7 +316,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   const SizedBox(height: 16),
                   if (invoice.notes.isNotEmpty) _buildNotesCard(isDark, loc),
                   const SizedBox(height: 16),
-                  _buildStatusAction(isDark, loc),
+                  if (!widget.readOnly) _buildStatusAction(isDark, loc),
                   const SizedBox(height: 32),
                 ],
               ),
